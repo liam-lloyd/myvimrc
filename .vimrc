@@ -33,6 +33,8 @@ set statusline+=%L        " Total lines
 set statusline+=\ -\      " Separator
 set statusline+=%c
 set foldlevelstart=0
+set incsearch
+set hlsearch
 
 filetype plugin indent on
 filetype on
@@ -41,8 +43,10 @@ filetype indent on
 " Temporary fix for bug in 8.2
 set t_TI= t_TE=
 
+" }}}
 
-let mapleader = ","
+" Basic Mappings ---------------------------------------------{{{
+let mapleader = "\<space>"
 let maplocalleader = "-"
 
 noremap H 0
@@ -54,15 +58,51 @@ nnoremap <TAB>h <c-w>h
 nnoremap <TAB>k <c-w>k
 nnoremap <TAB>l <c-w>l
 
+" Fast navigation of quickfixes
+nnoremap <leader>h :cp<cr>
+nnoremap <leader>l :cn<cr>
+
+" Start all searches with very-magic (under consideration)
+nnoremap / /\v
+
+" Unhighlight search results
+nnoremap <leader>nh :nohlsearch<cr>
+
 " Quick opening/sourcing of .vimrc
 nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
+
+" Quick command for opening the previous buffer in a new vsplit
+nnoremap <leader>ep :execute "rightbelow vsplit " . bufname('#')<cr>
+
+" Detect end-of-line whitespace
+nnoremap <leader>w :match Error /\v\s+$/<cr>
+nnoremap <leader>W :match Error none<cr>
+
+" Grep for word under cursor. TODO: Make this use ripgrep/fzf instead
+" nnoremap <leader>g :silent execute \"grep! -R \" . shellescape(expand("<cWORD>")) . \" .\"<cr>:copen<cr>:redraw!<cr>
 
 " Wrap words or selections in quotes
 vnoremap <leader>" <esc>`<i"<esc>`>a"<esc>
 vnoremap <leader>' <esc>`<i'<esc>`>a'<esc>
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+
+" Toggle quickfix window open and closed
+nnoremap <leader>q :call <SID>QuickfixToggle()<cr>
+let g:quickfix_is_open = 0
+
+function! s:QuickfixToggle()
+    if g:quickfix_is_open
+        cclose
+        let g:quickfix_is_open = 0
+        execute g:quickfix_return_to_window . "wincmd w"
+    else
+        let g:quickfix_return_to_window = winnr()
+        copen
+        let g:quickfix_is_open = 1
+    endif
+endfunction
 " }}}
 
 " Mappings of dubious usefulness to me ------------------------------------{{{
@@ -86,6 +126,18 @@ onoremap al@ :<c-u>execute "normal! ?\\s\\S*@\r:nohlsearch\rlvf.e"<cr>
 onoremap an@ :<c-u>execute "normal! /\\s\\S*@\r:nohlsearch\rlvf.e"<cr>
 onoremap il@ :<c-u>execute "normal! ?\\s\\S*@\r:nohlsearch\rlviw"<cr>
 onoremap in@ :<c-u>execute "normal! /\\s\\S*@\r:nohlsearch\rlviw"<cr>
+
+" Toggle foldcolumn (I can't evaluate how useful this is until I start using
+" more folds
+nnoremap <leader>F :call FoldColumnToggle()<cr>
+
+function! FoldColumnToggle()
+    if &foldcolumn
+        setlocal foldcolumn=0
+    else
+        setlocal foldcolumn=4
+    endif
+endfunction
 
 " }}}
 
@@ -210,6 +262,12 @@ endfunction
 let g:coc_snippet_next = '<tab>'
 " }}}
 
+" C# Settings ---------------------------------------------{{{
+augroup filetype_csharp
+    autocmd!
+    autocmd FileType cs nnoremap <expr> <leader>; getline('.') =~ ';$' ? '' : "mqA;\<esc>`q"
+augroup END
+" }}}
 
 " OmniSharp Settings -----------------------------------{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -239,33 +297,33 @@ augroup omnisharp_commands
   autocmd CursorHold *.cs OmniSharpTypeLookup
 
   " The following commands are contextual, based on the cursor position.
-  autocmd FileType cs nmap <silent> <buffer> gd <Plug>(omnisharp_go_to_definition)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osfu <Plug>(omnisharp_find_usages)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osfi <Plug>(omnisharp_find_implementations)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>ospd <Plug>(omnisharp_preview_definition)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>ospi <Plug>(omnisharp_preview_implementations)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>ost <Plug>(omnisharp_type_lookup)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osd <Plug>(omnisharp_documentation)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osfs <Plug>(omnisharp_find_symbol)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osfx <Plug>(omnisharp_fix_usings)
-  autocmd FileType cs nmap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
-  autocmd FileType cs imap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
+  autocmd FileType cs nnoremap <silent> <buffer> gd <Plug>(omnisharp_go_to_definition)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osfu <Plug>(omnisharp_find_usages)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osfi <Plug>(omnisharp_find_implementations)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>ospd <Plug>(omnisharp_preview_definition)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>ospi <Plug>(omnisharp_preview_implementations)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>ost <Plug>(omnisharp_type_lookup)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osd <Plug>(omnisharp_documentation)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osfs <Plug>(omnisharp_find_symbol)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osfx <Plug>(omnisharp_fix_usings)
+  autocmd FileType cs nnoremap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
+  autocmd FileType cs inoremap <silent> <buffer> <C-\> <Plug>(omnisharp_signature_help)
 
   " Navigate up and down by method/property/field
-  autocmd FileType cs nmap <silent> <buffer> [[ <Plug>(omnisharp_navigate_up)
-  autocmd FileType cs nmap <silent> <buffer> ]] <Plug>(omnisharp_navigate_down)
+  autocmd FileType cs nnoremap <silent> <buffer> [[ <Plug>(omnisharp_navigate_up)
+  autocmd FileType cs nnoremap <silent> <buffer> ]] <Plug>(omnisharp_navigate_down)
   " Find all code errors/warnings for the current solution and populate the quickfix window
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osgcc <Plug>(omnisharp_global_code_check)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osgcc <Plug>(omnisharp_global_code_check)
   " Contextual code actions (uses fzf, CtrlP or unite.vim when available)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
-  autocmd FileType cs xmap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
+  autocmd FileType cs xnoremap <silent> <buffer> <Leader>osca <Plug>(omnisharp_code_actions)
 
-  autocmd FileType cs nmap <silent> <buffer> <Leader>os= <Plug>(omnisharp_code_format)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>os= <Plug>(omnisharp_code_format)
 
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osnm <Plug>(omnisharp_rename)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osnm <Plug>(omnisharp_rename)
 
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osre <Plug>(omnisharp_restart_server)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
-  autocmd FileType cs nmap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osre <Plug>(omnisharp_restart_server)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
+  autocmd FileType cs nnoremap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
 augroup END
 " }}}
