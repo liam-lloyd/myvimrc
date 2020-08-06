@@ -12,8 +12,6 @@ function! s:PostgreSQLFormatter(type)
         " Save marks for last visual selection in `a and `b
         execute "normal! `<ma`>mb"
         execute "normal! `[yv`]"
-        echom @@
-        echom &selection
         let @@ = system('echo ' . shellescape(@@) . ' | pg_format --comma-break -')
         execute "normal! `[v`]p"
         " Restore marks
