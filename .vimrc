@@ -13,10 +13,12 @@ Plug 'AndrewRadev/splitjoin.vim'
 Plug 'fatih/molokai'
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'thanthese/Tortoise-Typing'
+Plug 'tpope/vim-fugitive'
+Plug 'tommcdo/vim-lion'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
-syntax on
+set nocompatible
 set number
 set shiftwidth=4
 set softtabstop=4
@@ -36,9 +38,8 @@ set foldlevelstart=0
 set incsearch
 set hlsearch
 
+syntax on
 filetype plugin indent on
-filetype on
-filetype indent on
 
 " Temporary fix for bug in 8.2
 set t_TI= t_TE=
@@ -178,6 +179,7 @@ augroup filetype_go
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
     autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
     autocmd FileType go nmap <Leader>i <Plug>(go-info)
+    autocmd FileType go nnoremap <buffer> <silent> gb :<C-U>call go#def#StackPop(v:count1)<cr>
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
     autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
 augroup END
@@ -223,6 +225,8 @@ noremap \ :Commentary<CR>
 augroup filetype_ruby
     autocmd!
     autocmd FileType ruby setlocal commentstring=#\ %s
+    autocmd FileType ruby noremap gd <C-]>
+    autocmd FileType ruby noremap gb <C-t>
     autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2
     autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
 augroup END
