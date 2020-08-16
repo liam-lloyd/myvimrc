@@ -228,8 +228,14 @@ augroup filetype_ruby
     autocmd FileType ruby noremap gd <C-]>
     autocmd FileType ruby noremap gb <C-t>
     autocmd FileType ruby setlocal expandtab shiftwidth=2 tabstop=2
+    autocmd FileType ruby onoremap nab :<c-u>execute "normal! /\\vdo\\_.{-}((begin\|case\|class\|def\|do\|for\|if\|module\|unless\|until\|while)\\_.{-}end)\\_.{-}end\r:nohlsearch\rgn"<cr>
+    autocmd FileType ruby onoremap nib :<c-u>execute "normal! /\\vdo\\zs\\_.{-}((begin\|case\|class\|def\|do\|for\|if\|module\|unless\|until\|while)\\_.{-}end)\\_.{-}\\ze\\n\\s\*end\r:nohlsearch\rgn"<cr>
     autocmd FileType eruby setlocal expandtab shiftwidth=2 tabstop=2
 augroup END
+" }}}
+
+" Python Settings ----------------------------------------------------{{{
+iabbrev ifmain if __name__ == "__main__":
 " }}}
 
 " Syntastic Settings ----------------------------------------------{{{
