@@ -15,13 +15,16 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'thanthese/Tortoise-Typing'
 Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-lion'
+Plug 'wfxr/minimap.vim'
+Plug 'wincent/terminus'
+Plug 'tpope/vim-dadbod'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
 set nocompatible
 set number
-set shiftwidth=4
-set softtabstop=4
+set shiftwidth=2
+set softtabstop=2
 set autoindent
 set expandtab
 set colorcolumn=121
@@ -43,6 +46,14 @@ filetype plugin indent on
 
 " Temporary fix for bug in 8.2
 set t_TI= t_TE=
+
+augroup general
+    autocmd!
+    autocmd BufNewFile,BufRead *.proto setfiletype proto
+augroup END
+
+let g:local_db = 'postgresql://postgres:postgres@localhost:5432/web_db'
+let g:test_db = 'postgresql://postgres:postgres@localhost:5432/test_web_db'
 
 " }}}
 
@@ -80,14 +91,20 @@ nnoremap <leader>ep :execute "rightbelow vsplit " . bufname('#')<cr>
 nnoremap <leader>w :match Error /\v\s+$/<cr>
 nnoremap <leader>W :match Error none<cr>
 
+" Add empty lines without leaving normal mode
+nnoremap <leader>o o<esc>k
+nnoremap <leader>O O<esc>k
+
 " Grep for word under cursor. TODO: Make this use ripgrep/fzf instead
 " nnoremap <leader>g :silent execute \"grep! -R \" . shellescape(expand("<cWORD>")) . \" .\"<cr>:copen<cr>:redraw!<cr>
 
 " Wrap words or selections in quotes
-vnoremap <leader>" <esc>`<i"<esc>`>a"<esc>
-vnoremap <leader>' <esc>`<i'<esc>`>a'<esc>
+vnoremap <leader>" <esc>`<i"<esc>`>la"<esc>
+vnoremap <leader>' <esc>`<i'<esc>`>la'<esc>
+vnoremap <leader>` <esc>`<i`<esc>`>la`<esc>
 nnoremap <leader>" viw<esc>a"<esc>bi"<esc>lel
 nnoremap <leader>' viw<esc>a'<esc>bi'<esc>lel
+nnoremap <leader>` viw<esc>a`<esc>bi`<esc>lel
 
 " Toggle quickfix window open and closed
 nnoremap <leader>q :call <SID>QuickfixToggle()<cr>
@@ -142,10 +159,22 @@ endfunction
 
 " }}}
 
+" Minimap.vim Settings ------------------------------{{{
+nnoremap <leader>mm :MinimapToggle<CR>
+"}}}
+
 " Vimscript file settings----------------------------------------{{{
 augroup filetype_vim
     autocmd!
     autocmd FileType vim setlocal foldmethod=marker
+augroup END
+" }}}
+
+" SQL file settings----------------------------------------{{{
+augroup filetype_sql
+    autocmd!
+    autocmd FileType sql nnoremap <leader>sq :DB g:local_db<cr>
+    autocmd FileType sql vnoremap <leader>sq :DB g:local_db<cr>
 augroup END
 " }}}
 
@@ -179,9 +208,17 @@ augroup filetype_go
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
     autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
     autocmd FileType go nmap <Leader>i <Plug>(go-info)
+    autocmd FileType go nmap <Leader>ti :GoBuildTag integration<CR>
+    autocmd FileType go nmap <Leader>gr :GoReferrers <CR>
+    autocmd FileType go nmap \af vaf\
+    autocmd FileType go nmap \if vif\
+    autocmd FileType go nnoremap <Leader>mv :! go mod vendor<CR>
     autocmd FileType go nnoremap <buffer> <silent> gb :<C-U>call go#def#StackPop(v:count1)<cr>
     autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
     autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
+    autocmd Filetype go set noexpandtab
+    autocmd Filetype go set shiftwidth=8
+    autocmd Filetype go set softtabstop=8
 augroup END
 " }}}
 
@@ -238,6 +275,13 @@ augroup END
 autocmd FileType python iabbrev ifmain if __name__ == "__main__":
 autocmd FileType python nnoremap <leader>; $a:<esc>
 " }}}
+
+" Protobuf Settings --------------------------------------------------{{{
+augroup filetype_protobuf
+    autocmd!
+    autocmd FileType proto setlocal expandtab shiftwidth=2 tabstop=2
+augroup END
+"}}}
 
 " Syntastic Settings ----------------------------------------------{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
