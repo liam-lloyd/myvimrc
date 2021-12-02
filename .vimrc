@@ -2,6 +2,8 @@ call plug#begin()
 Plug 'vim-ruby/vim-ruby'
 Plug 'tpope/vim-rails'
 Plug 'preservim/nerdtree'
+Plug 'ryanoasis/vim-devicons'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
 Plug 'tpope/vim-commentary'
@@ -17,8 +19,19 @@ Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-lion'
 Plug 'wincent/terminus'
 Plug 'tpope/vim-dadbod'
-Plug 'junegunn/goyo.vim'
+Plug 'lifepillar/pgsql.vim'
 Plug 'dracula/vim'
+Plug 'junegunn/goyo.vim'
+Plug 'unblevable/quick-scope'
+Plug 'AndrewRadev/inline_edit.vim'
+Plug 'meain/vim-jsontogo'
+Plug 'psf/black', { 'branch': 'stable' }
+Plug 'davidhalter/jedi-vim'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'puremourning/vimspector'
+Plug 'mechatroner/rainbow_csv'
+Plug 'luochen1990/rainbow'
+Plug 'prendradjaja/vim-vertigo'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -41,6 +54,7 @@ set statusline+=%c
 set foldlevelstart=0
 set incsearch
 set hlsearch
+set encoding=UTF-8
 
 syntax on
 filetype plugin indent on
@@ -58,6 +72,8 @@ augroup END
 
 let g:local_db = 'postgresql://postgres:postgres@localhost:5432/web_db'
 let g:test_db = 'postgresql://postgres:postgres@localhost:5432/test_web_db'
+let g:vimspector_enable_mappings = 'HUMAN'
+" packadd! vimspector
 
 " }}}
 
@@ -90,6 +106,9 @@ nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " Quick command for opening the previous buffer in a new vsplit
 nnoremap <leader>ep :execute "rightbelow vsplit " . bufname('#')<cr>
+
+" Quick command for opening a terminal within Vim
+nnoremap <leader>tt :term<cr>
 
 " Detect end-of-line whitespace
 nnoremap <leader>w :match Error /\v\s+$/<cr>
@@ -125,6 +144,10 @@ function! s:QuickfixToggle()
         let g:quickfix_is_open = 1
     endif
 endfunction
+
+nmap <leader>si <Plug>VimspectorStepInto
+nmap <leader>so <Plug>VimspectorStepOut
+nmap <leader>n <Plug>VimspectorStepOver
 " }}}
 
 " Mappings of dubious usefulness to me ------------------------------------{{{
@@ -163,8 +186,27 @@ endfunction
 
 " }}}
 
+" vim-vertigo Settings ----------------------------------{{{
+nnoremap <silent> <Space>j :<C-U>VertigoDown n<CR>
+vnoremap <silent> <Space>j :<C-U>VertigoDown v<CR>
+onoremap <silent> <Space>j :<C-U>VertigoDown o<CR>
+nnoremap <silent> <Space>k :<C-U>VertigoUp n<CR>
+vnoremap <silent> <Space>k :<C-U>VertigoUp v<CR>
+onoremap <silent> <Space>k :<C-U>VertigoUp o<CR>
+" }}}
+
+" Rainbow Settings ----------------------------------{{{
+let g:rainbow_active = 1
+" }}}
+
 " Minimap.vim Settings ------------------------------{{{
 nnoremap <leader>mm :MinimapToggle<CR>
+"}}}
+
+" Goyo Settings ------------------------------------{{{
+let g:goyo_width = 120
+
+nnoremap <leader>ce :Goyo<cr>
 "}}}
 
 " Vimscript file settings----------------------------------------{{{
@@ -191,9 +233,13 @@ let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_highlight_build_constraints = 1
-let g:go_metalinter_autosave_enabled = ['vet']
+let g:go_metalinter_autosave = 1
+let g:go_metalinter_autosave_enabled = ['deadcode', 'goconst', 'gocritic', 'gocyclo', 'goimports', 'gosimple', 'govet', 'ineffassign', 'misspell', 'exportloopref', 'staticcheck', 'structcheck', 'typecheck', 'unconvert', 'unused', 'varcheck', 'vetshadow', 'whitespace']
+let g:go_metalinter_command = 'golangci-lint'
+let g:go_metalinter_enabled = ['deadcode', 'goconst', 'gocritic', 'gocyclo', 'goimports', 'gosimple', 'govet', 'ineffassign', 'misspell', 'exportloopref', 'staticcheck', 'structcheck', 'typecheck', 'unconvert', 'unused', 'varcheck', 'vetshadow', 'whitespace']
 let g:go_auto_type_info = 1
 let g:go_auto_sameids = 1
+let g:go_code_completion_enabled = 1
 set updatetime=100
 
 " run :GoBuild or :GoTestCompile based on the go file
@@ -209,6 +255,7 @@ endfunction
 augroup filetype_go
     autocmd!
     autocmd FileType go nmap <leader>t  <Plug>(go-test)
+    autocmd FileType go nmap <leader>tf <Plug>(go-test-func)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
     autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
     autocmd FileType go nmap <Leader>i <Plug>(go-info)
@@ -230,13 +277,19 @@ augroup END
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:rehash256 = 1
 " let g:molokai_original = 1
-" colorscheme molokai
+let g:dracula_italic = 0
+let g:dracula_bold = 0
+let g:dracula_underline = 0
+let g:dracula_undercurl = 0
+let g:dracula_inverse = 0
+let g:dracula_colorterm = 0
 colorscheme dracula
 " }}}
 
 " NERDTree Settings -----------------------------------------------------{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <leader>r :NERDTreeFind<cr>
+nnoremap <leader>rq :NERDTreeToggle<cr>
 
 augroup nerdtree
     autocmd!
@@ -276,9 +329,49 @@ augroup filetype_ruby
 augroup END
 " }}}
 
+" Java Settings --------------------------------------------------{{{
+augroup filetype_java
+  autocmd!
+  autocmd FileType java nnoremap <silent> gb <C-o>
+  autocmd FileType java nmap <silent> gd <Plug>(coc-definition)
+  autocmd FileType java nmap  <silent> gy <Plug>(coc-type-definition)
+  autocmd FileType java nmap  <silent> gi <Plug>(coc-implementation)
+  autocmd FileType java nmap  <silent> gr <Plug>(coc-references)
+  autocmd FileType java xmap if <Plug>(coc-funcobj-i)
+  autocmd FileType java omap if <Plug>(coc-funcobj-i)
+  autocmd FileType java xmap af <Plug>(coc-funcobj-a)
+  autocmd FileType java omap af <Plug>(coc-funcobj-a)
+  autocmd FileType java xmap ic <Plug>(coc-classobj-i)
+  autocmd FileType java omap ic <Plug>(coc-classobj-i)
+  autocmd FileType java xmap ac <Plug>(coc-classobj-a)
+  autocmd FileType java omap ac <Plug>(coc-classobj-a)
+  autocmd FileType groovy nnoremap <silent> gb <C-o>
+  autocmd FileType groovy nmap <silent> gd <Plug>(coc-definition)
+  autocmd FileType groovy nmap  <silent> gy <Plug>(coc-type-definition)
+  autocmd FileType groovy nmap  <silent> gi <Plug>(coc-implementation)
+  autocmd FileType groovy nmap  <silent> gr <Plug>(coc-references)
+  autocmd FileType groovy xmap if <Plug>(coc-funcobj-i)
+  autocmd FileType groovy omap if <Plug>(coc-funcobj-i)
+  autocmd FileType groovy xmap af <Plug>(coc-funcobj-a)
+  autocmd FileType groovy omap af <Plug>(coc-funcobj-a)
+  autocmd FileType groovy xmap ic <Plug>(coc-classobj-i)
+  autocmd FileType groovy omap ic <Plug>(coc-classobj-i)
+  autocmd FileType groovy xmap ac <Plug>(coc-classobj-a)
+  autocmd FileType groovy omap ac <Plug>(coc-classobj-a)
+augroup END
+" }}}
+
 " Python Settings ----------------------------------------------------{{{
-autocmd FileType python iabbrev ifmain if __name__ == "__main__":
-autocmd FileType python nnoremap <leader>; $a:<esc>
+let g:jedi#rename_command = "<leader>R"
+augroup filetype_python
+    autocmd!
+    autocmd FileType python iabbrev ifmain if __name__ == "__main__":
+    autocmd FileType python nnoremap <leader>; $a:<esc>
+    autocmd FileType python nnoremap gd :<C-U>call jedi#goto()<cr>
+    autocmd FileType python nnoremap gb <C-t>
+    autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=4
+    autocmd BufWritePre *.py execute ':Black'
+augroup END
 " }}}
 
 " Protobuf Settings --------------------------------------------------{{{
@@ -386,4 +479,8 @@ augroup omnisharp_commands
   autocmd FileType cs nnoremap <silent> <buffer> <Leader>osst <Plug>(omnisharp_start_server)
   autocmd FileType cs nnoremap <silent> <buffer> <Leader>ossp <Plug>(omnisharp_stop_server)
 augroup END
+" }}}
+
+" PostgreSQL Settings ----------------------------{{{
+let g:sql_type_default = 'pgsql'
 " }}}
