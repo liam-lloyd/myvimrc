@@ -15,9 +15,10 @@ Plug 'ctrlpvim/ctrlp.vim'
 Plug 'thanthese/Tortoise-Typing'
 Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-lion'
-Plug 'wfxr/minimap.vim'
 Plug 'wincent/terminus'
 Plug 'tpope/vim-dadbod'
+Plug 'junegunn/goyo.vim'
+Plug 'dracula/vim'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -46,6 +47,9 @@ filetype plugin indent on
 
 " Temporary fix for bug in 8.2
 set t_TI= t_TE=
+
+" Hack for a problem I've encountered in xterm
+nmap <c-u> <c-u><c-l>
 
 augroup general
     autocmd!
@@ -224,9 +228,10 @@ augroup END
 
 " Theme Settings-----------------------------------------------------------{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:rehash256 = 1
-let g:molokai_original = 1
-colorscheme molokai
+" let g:rehash256 = 1
+" let g:molokai_original = 1
+" colorscheme molokai
+colorscheme dracula
 " }}}
 
 " NERDTree Settings -----------------------------------------------------{{{
