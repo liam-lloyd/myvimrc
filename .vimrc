@@ -12,17 +12,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'OmniSharp/omnisharp-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'fatih/molokai'
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'thanthese/Tortoise-Typing'
 Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-lion'
-Plug 'wfxr/minimap.vim'
 Plug 'wincent/terminus'
-Plug 'tpope/vim-dadbod'
 Plug 'lifepillar/pgsql.vim'
 Plug 'dracula/vim'
-Plug 'junegunn/goyo.vim'
 Plug 'unblevable/quick-scope'
 Plug 'AndrewRadev/inline_edit.vim'
 Plug 'meain/vim-jsontogo'
@@ -32,7 +27,8 @@ Plug 'ludovicchabant/vim-gutentags'
 Plug 'puremourning/vimspector'
 Plug 'mechatroner/rainbow_csv'
 Plug 'luochen1990/rainbow'
-Plug 'prendradjaja/vim-vertigo'
+Plug 'tpope/vim-sleuth'
+Plug 'prettier/vim-prettier'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
