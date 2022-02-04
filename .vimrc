@@ -193,16 +193,6 @@ onoremap <silent> <Space>k :<C-U>VertigoUp o<CR>
 let g:rainbow_active = 1
 " }}}
 
-" Minimap.vim Settings ------------------------------{{{
-nnoremap <leader>mm :MinimapToggle<CR>
-"}}}
-
-" Goyo Settings ------------------------------------{{{
-let g:goyo_width = 120
-
-nnoremap <leader>ce :Goyo<cr>
-"}}}
-
 " Vimscript file settings----------------------------------------{{{
 augroup filetype_vim
     autocmd!
@@ -264,6 +254,8 @@ augroup filetype_go
     autocmd Filetype go set noexpandtab
     autocmd Filetype go set shiftwidth=8
     autocmd Filetype go set softtabstop=8
+    autocmd Filetype go :RainbowToggle
+    autocmd Filetype go :RainbowToggle
 augroup END
 " }}}
 
@@ -271,11 +263,11 @@ augroup END
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:rehash256 = 1
 " let g:molokai_original = 1
-let g:dracula_italic = 0
-let g:dracula_bold = 0
-let g:dracula_underline = 0
-let g:dracula_undercurl = 0
-let g:dracula_inverse = 0
+let g:dracula_italic = 1
+let g:dracula_bold = 1
+let g:dracula_underline = 1
+let g:dracula_undercurl = 1
+let g:dracula_inverse = 1
 let g:dracula_colorterm = 0
 colorscheme dracula
 " }}}
