@@ -12,16 +12,12 @@ Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'OmniSharp/omnisharp-vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 Plug 'AndrewRadev/splitjoin.vim'
-Plug 'fatih/molokai'
 Plug 'ctrlpvim/ctrlp.vim'
-Plug 'thanthese/Tortoise-Typing'
 Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-lion'
 Plug 'wincent/terminus'
-Plug 'tpope/vim-dadbod'
 Plug 'lifepillar/pgsql.vim'
 Plug 'dracula/vim'
-Plug 'junegunn/goyo.vim'
 Plug 'unblevable/quick-scope'
 Plug 'AndrewRadev/inline_edit.vim'
 Plug 'meain/vim-jsontogo'
@@ -31,7 +27,8 @@ Plug 'ludovicchabant/vim-gutentags'
 Plug 'puremourning/vimspector'
 Plug 'mechatroner/rainbow_csv'
 Plug 'luochen1990/rainbow'
-Plug 'prendradjaja/vim-vertigo'
+Plug 'tpope/vim-sleuth'
+Plug 'prettier/vim-prettier'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -199,16 +196,6 @@ onoremap <silent> <Space>k :<C-U>VertigoUp o<CR>
 let g:rainbow_active = 1
 " }}}
 
-" Minimap.vim Settings ------------------------------{{{
-nnoremap <leader>mm :MinimapToggle<CR>
-"}}}
-
-" Goyo Settings ------------------------------------{{{
-let g:goyo_width = 120
-
-nnoremap <leader>ce :Goyo<cr>
-"}}}
-
 " Vimscript file settings----------------------------------------{{{
 augroup filetype_vim
     autocmd!
@@ -270,6 +257,8 @@ augroup filetype_go
     autocmd Filetype go set noexpandtab
     autocmd Filetype go set shiftwidth=8
     autocmd Filetype go set softtabstop=8
+    autocmd Filetype go :RainbowToggle
+    autocmd Filetype go :RainbowToggle
 augroup END
 " }}}
 
@@ -277,11 +266,11 @@ augroup END
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:rehash256 = 1
 " let g:molokai_original = 1
-let g:dracula_italic = 0
-let g:dracula_bold = 0
-let g:dracula_underline = 0
-let g:dracula_undercurl = 0
-let g:dracula_inverse = 0
+let g:dracula_italic = 1
+let g:dracula_bold = 1
+let g:dracula_underline = 1
+let g:dracula_undercurl = 1
+let g:dracula_inverse = 1
 let g:dracula_colorterm = 0
 colorscheme dracula
 " }}}
