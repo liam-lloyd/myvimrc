@@ -29,6 +29,9 @@ Plug 'mechatroner/rainbow_csv'
 Plug 'luochen1990/rainbow'
 Plug 'tpope/vim-sleuth'
 Plug 'prettier/vim-prettier'
+Plug 'yuezk/vim-js'
+Plug 'maxmellon/vim-jsx-pretty'
+Plug 'ruanyl/vim-gh-line'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -67,8 +70,6 @@ augroup general
     autocmd BufNewFile,BufRead *.proto setfiletype proto
 augroup END
 
-let g:local_db = 'postgresql://postgres:postgres@localhost:5432/web_db'
-let g:test_db = 'postgresql://postgres:postgres@localhost:5432/test_web_db'
 let g:vimspector_enable_mappings = 'HUMAN'
 " packadd! vimspector
 
@@ -78,7 +79,7 @@ let g:vimspector_enable_mappings = 'HUMAN'
 let mapleader = "\<space>"
 let maplocalleader = "-"
 
-noremap H 0
+noremap H ^
 noremap L $
 
 " Make window navigation easier by not using Control
@@ -145,6 +146,37 @@ endfunction
 nmap <leader>si <Plug>VimspectorStepInto
 nmap <leader>so <Plug>VimspectorStepOut
 nmap <leader>n <Plug>VimspectorStepOver
+
+" Search selection with * in visual mode
+function! VisualSelection(direction, extra_filter) range
+    let l:saved_reg = @"
+    execute "normal! vgvy"
+
+    let l:pattern = escape(@", "\\/.*'$^~[]")
+    let l:pattern = substitute(l:pattern, "\n$", "", "")
+
+    if a:direction == 'gv'
+        call CmdLine("Ack '" . l:pattern . "' " )
+    elseif a:direction == 'replace'
+        call CmdLine("%s" . '/'. l:pattern . '/')
+    endif
+
+    let @/ = l:pattern
+    let @" = l:saved_reg
+endfunction
+
+vnoremap <silent> * :<C-u>call VisualSelection('', '')<CR>/<C-R>=@/<CR><CR>
+
+" centers the current pane as the middle 2 of 4 imaginary columns
+" should be called in a window with a single pane. Call with leader + c
+
+ function CenterPane()
+   lefta vnew
+   wincmd w
+   exec 'vertical resize '. string(&columns * 0.66)
+ endfunction
+
+nnoremap <leader>c :call CenterPane()<cr>
 " }}}
 
 " Mappings of dubious usefulness to me ------------------------------------{{{
@@ -183,15 +215,6 @@ endfunction
 
 " }}}
 
-" vim-vertigo Settings ----------------------------------{{{
-nnoremap <silent> <Space>j :<C-U>VertigoDown n<CR>
-vnoremap <silent> <Space>j :<C-U>VertigoDown v<CR>
-onoremap <silent> <Space>j :<C-U>VertigoDown o<CR>
-nnoremap <silent> <Space>k :<C-U>VertigoUp n<CR>
-vnoremap <silent> <Space>k :<C-U>VertigoUp v<CR>
-onoremap <silent> <Space>k :<C-U>VertigoUp o<CR>
-" }}}
-
 " Rainbow Settings ----------------------------------{{{
 let g:rainbow_active = 1
 " }}}
@@ -200,14 +223,6 @@ let g:rainbow_active = 1
 augroup filetype_vim
     autocmd!
     autocmd FileType vim setlocal foldmethod=marker
-augroup END
-" }}}
-
-" SQL file settings----------------------------------------{{{
-augroup filetype_sql
-    autocmd!
-    autocmd FileType sql nnoremap <leader>sq :DB g:local_db<cr>
-    autocmd FileType sql vnoremap <leader>sq :DB g:local_db<cr>
 augroup END
 " }}}
 
@@ -244,10 +259,11 @@ augroup filetype_go
     autocmd FileType go nmap <leader>t  <Plug>(go-test)
     autocmd FileType go nmap <leader>tf <Plug>(go-test-func)
     autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-    autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
+    autocmd FileType go nmap <Leader>tc <Plug>(go-coverage-toggle)
     autocmd FileType go nmap <Leader>i <Plug>(go-info)
     autocmd FileType go nmap <Leader>ti :GoBuildTag integration<CR>
     autocmd FileType go nmap <Leader>gr :GoReferrers <CR>
+    autocmd FileType go nmap <Leader>ml :GoMetaLinter <CR>
     autocmd FileType go nmap \af vaf\
     autocmd FileType go nmap \if vif\
     autocmd FileType go nnoremap <Leader>mv :! go mod vendor<CR>
@@ -297,6 +313,10 @@ noremap <leader>f :Rg<CR>
 command! -bang -nargs=? -complete=dir Files
     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--info=inline']}), <bang>0)
 let g:fzf_preview_window = 'right:60%'
+" }}}
+
+" Github Integration Settings ------------------------------------{{{
+let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
 " }}}
 
 " Commentary Settings --------------------------------------{{{
@@ -361,6 +381,10 @@ augroup filetype_python
     autocmd FileType python setlocal expandtab shiftwidth=4 tabstop=4
     autocmd BufWritePre *.py execute ':Black'
 augroup END
+" }}}
+
+" Javascript Settings -------------------------------------------{{{
+let g:vim_jsx_pretty_highlight_close_tag = 1
 " }}}
 
 " Protobuf Settings --------------------------------------------------{{{
