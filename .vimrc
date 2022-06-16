@@ -32,6 +32,12 @@ Plug 'prettier/vim-prettier'
 Plug 'yuezk/vim-js'
 Plug 'maxmellon/vim-jsx-pretty'
 Plug 'ruanyl/vim-gh-line'
+Plug 'tpope/vim-abolish'
+Plug 'StanAngeloff/php.vim'
+Plug 'stephpy/vim-php-cs-fixer'
+Plug 'phpactor/phpactor', {'for': 'php', 'tag': '*', 'do': 'composer install --no-dev -o'}
+Plug 'adoy/vim-php-refactoring-toolbox'
+Plug 'vim-vdebug/vdebug'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -103,7 +109,7 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " Quick command for opening the previous buffer in a new vsplit
-nnoremap <leader>ep :execute "rightbelow vsplit " . bufname('#')<cr>
+" nnoremap <leader>ep :execute 'rightbelow vsplit ' . bufname('#')<cr>
 
 " Quick command for opening a terminal within Vim
 nnoremap <leader>tt :term<cr>
@@ -278,6 +284,16 @@ augroup filetype_go
 augroup END
 " }}}
 
+" PHPSettings--------------------------------------------------------------{{{
+let g:php_cs_fixer_path='tools/php-cs-fixer/vendor/bin/php-cs-fixer'
+augroup php
+    autocmd!
+    autocmd BufWritePost *.php silent! call PhpCsFixerFixFile()
+    autocmd Filetype php set shiftwidth=4
+    autocmd Filetype php set softtabstop=4
+augroup END
+" }}}
+
 " Theme Settings-----------------------------------------------------------{{{
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " let g:rehash256 = 1
@@ -316,7 +332,7 @@ let g:fzf_preview_window = 'right:60%'
 " }}}
 
 " Github Integration Settings ------------------------------------{{{
-let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
+let g:gh_open_command = 'fn() { echo "$@" | xclip -sel clip; }; fn '
 " }}}
 
 " Commentary Settings --------------------------------------{{{
