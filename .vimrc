@@ -38,6 +38,12 @@ Plug 'stephpy/vim-php-cs-fixer'
 Plug 'phpactor/phpactor', {'for': 'php', 'tag': '*', 'do': 'composer install --no-dev -o'}
 Plug 'adoy/vim-php-refactoring-toolbox'
 Plug 'vim-vdebug/vdebug'
+Plug 'burnettk/vim-angular'
+Plug 'leafgarland/typescript-vim'
+Plug 'pangloss/vim-javascript'
+Plug 'Quramy/tsuquyomi'
+Plug 'hashivim/vim-terraform'
+Plug 'github/copilot.vim'
 call plug#end()
 
 " Basic Settings -------------------------------------{{{
@@ -64,6 +70,7 @@ set encoding=UTF-8
 
 syntax on
 filetype plugin indent on
+au BufRead /tmp/psql.edit.* set syntax=sql
 
 " Temporary fix for bug in 8.2
 set t_TI= t_TE=
@@ -74,6 +81,7 @@ nmap <c-u> <c-u><c-l>
 augroup general
     autocmd!
     autocmd BufNewFile,BufRead *.proto setfiletype proto
+    autocmd FileType php,ts autocmd BufWritePre <buffer> %s/\s\+$//e
 augroup END
 
 let g:vimspector_enable_mappings = 'HUMAN'
@@ -109,7 +117,7 @@ nnoremap <leader>ev :vsplit $MYVIMRC<cr>
 nnoremap <leader>sv :source $MYVIMRC<cr>
 
 " Quick command for opening the previous buffer in a new vsplit
-" nnoremap <leader>ep :execute 'rightbelow vsplit ' . bufname('#')<cr>
+nnoremap <leader>op :execute 'rightbelow vsplit ' . bufname('#')<cr>
 
 " Quick command for opening a terminal within Vim
 nnoremap <leader>tt :term<cr>
@@ -288,6 +296,9 @@ augroup END
 let g:php_cs_fixer_path='tools/php-cs-fixer/vendor/bin/php-cs-fixer'
 augroup php
     autocmd!
+    let g:prettier#autoformat=1
+    let g:prettier#autoformat_require_pragma = 1
+    let g:prettier#exec_cmd_path='tools/prettier/node_modules/.bin/prettier'
     autocmd BufWritePost *.php silent! call PhpCsFixerFixFile()
     autocmd Filetype php set shiftwidth=4
     autocmd Filetype php set softtabstop=4
@@ -401,6 +412,15 @@ augroup END
 
 " Javascript Settings -------------------------------------------{{{
 let g:vim_jsx_pretty_highlight_close_tag = 1
+augroup filetype_typescript
+    autocmd!
+    let g:prettier#exec_cmd_path='node_modules/.bin/prettier'
+    let g:prettier#autoformat=1
+    let g:prettier#autoformat_require_pragma = 0
+    autocmd FileType typescript nnoremap gd :TsuDefinition<cr>
+    autocmd FileType typescript nnoremap gb :TsuGoBack<cr>
+    autocmd FileType typescript nmap <buffer> <Leader>i : <C-u>echo tsuquyomi#hint()<CR>
+augroup END
 " }}}
 
 " Protobuf Settings --------------------------------------------------{{{
@@ -418,9 +438,11 @@ set statusline+=%*
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
+let g:syntastic_check_on_open = 0
+let g:syntastic_check_on_wq = 1
 let g:syntastic_cs_checkers = ['code_checker']
+let g:syntastic_typescript_eslint_exe='$(npm bin)/eslint'
+let g:syntastic_typescript_checkers = ['eslint']
 " }}}
 
 " Coc.nvim Settings -------------------------------------------------{{{
@@ -431,12 +453,12 @@ let g:coc_disable_startup_warning = 1
 " NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
 " other plugin before putting this into your config.
 inoremap <silent><expr> <TAB>
-      \ pumvisible() ? coc#_select_confirm() :
-      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#pum#visible() ? coc#pum#next(1) :
+      \ CheckBackspace() ? "\<Tab>" :
       \ coc#refresh()
+inoremap <expr><S-TAB> coc#pum#visible() ? coc#pum#prev(1) : "\<C-h>"
 
-function! s:check_back_space() abort
+function! CheckBackspace() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
